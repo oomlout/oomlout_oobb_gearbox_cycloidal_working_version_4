@@ -3,6 +3,7 @@ import opsc
 import oobb
 import oobb_base
 import math
+import shutil
 
 def main(**kwargs):
     make_scad(**kwargs)
@@ -18,7 +19,7 @@ def make_scad(**kwargs):
         #filter = "outer_rotor_main"
         #filter = "outer_rotor_outer_drive_shaft"
         #filter = "inner_rotor_drive_shaft"
-        filter = "outer_rotor_spacer"
+        #filter = "outer_rotor_spacer"
         #filter = ["outer_rotor_outer_drive_shaft", "outer_rotor_inner_drive_shaft", "inner_rotor_drive_shaft"]
 
         #kwargs["save_type"] = "none"
@@ -26,9 +27,12 @@ def make_scad(**kwargs):
         
         kwargs["overwrite"] = True
         
-        #kwargs["modes"] = ["3dpr", "laser", "true"]        
+        kwargs["modes"] = ["3dpr", "laser", "true"]        
         #kwargs["modes"] = ["3dpr"]
-        kwargs["modes"] = ["laser"]
+        #kwargs["modes"] = ["laser"]
+
+        prepare_for_print = True
+        #prepare_for_print = False
 
     # default variables
     if True:
@@ -92,6 +96,14 @@ def make_scad(**kwargs):
 
         part = copy.deepcopy(part_default)
         p3 = copy.deepcopy(kwargs)
+        p3["thickness"] = 3
+        part["kwargs"] = p3
+        part["name"] = "inner_rotor_bearing_plate_6705"
+        parts.append(part)
+
+
+        part = copy.deepcopy(part_default)
+        p3 = copy.deepcopy(kwargs)
         p3["thickness"] = 3 
         part["kwargs"] = p3
         part["name"] = "outer_rotor_main"
@@ -105,6 +117,14 @@ def make_scad(**kwargs):
         part["name"] = "outer_rotor_spacer"
         parts.append(part)
         
+        part = copy.deepcopy(part_default)
+        p3 = copy.deepcopy(kwargs)
+        p3["thickness"] = 3 
+        part["kwargs"] = p3
+        part["name"] = "outer_rotor_bearing_plate_6810"
+        parts.append(part)
+
+    kwargs["parts"] = parts
     #make the parts
     if True:
         for part in parts:
@@ -121,6 +141,29 @@ def make_scad(**kwargs):
                 print(f"done {part['name']}")
             else:
                 print(f"skipping {part['name']}")
+
+    #make the print folder
+    if prepare_for_print:        
+        oobb_base.prepare_print_folder(**kwargs)
+
+def get_inner_rotor_bearing_plate_6705(thing, **kwargs):
+    t = 9
+    w = 3
+    h = 3
+    b = "6705"
+    size="oobb"
+    thing_dict = {"type": "bearing_plate", "width": w, "height": h, "thickness": t, "bearing": b,"size": size, "extra":"minimal_missing_middle_3_mm"}
+    thing_2 = oobb_base.get_thing_from_dict(thing_dict)
+    thing["components"] = thing_2["components"]
+    return thing
+
+
+
+def get_outer_rotor_bearing_plate_6810(thing, **kwargs):
+    thing_dict = {"type": "bearing_plate", "width": 5, "height": 5, "thickness": 12, "bearing": "6810","size": "oobb", "extra":"three_quarter"}
+    thing_2 = oobb_base.get_thing_from_dict(thing_dict)
+    thing["components"] = thing_2["components"]
+    return thing
 
 def get_outer_rotor_inner_drive_shaft(thing, **kwargs):
     p3 = copy.deepcopy(kwargs)
@@ -841,6 +884,17 @@ def get_inner_rotor_main(thing, **kwargs):
 
 ###### utilities
 
+def prepare_print_folder(**kwargs):
+    print("preparing print folder")
+    folder_print = "scad_output/3d_printer_files"
+    parts = kwargs.get("parts", [])
+    part_count = 1
+    for part in parts:
+        pass
+        file_input = f'scad_output/{part["id"]}/3dpr.stl'
+        file_output = f'{folder_print}/{part_count}_{part["id"]}.stl'
+        print(f"copying {file_input} to {file_output}")
+        shutil.copyfile(file_input, file_output)
 
 
 def make_scad_generic(part):
@@ -855,7 +909,7 @@ def make_scad_generic(part):
     save_type = kwargs.get("save_type", "all")
     overwrite = kwargs.get("overwrite", True)
 
-    kwargs["type"] = f"{project_name}_{name}"
+    kwargs["type"] = f"{name}"
 
     thing = oobb_base.get_default_thing(**kwargs)
     kwargs.pop("size","")

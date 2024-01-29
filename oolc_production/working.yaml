@@ -1,6 +1,10 @@
 project_id: oomlout_oobb_gearbox_cycloidal_working
 project_name: Oomlout Oobb Gearbox Cycloidal Working
 project_repo: https://github.com/oomlout/oomlout_oobb_gearbox_cycloidal_working
-# production_format:
-#   oolc_1:
-#     file_location: source_files/oolc_1.cdr
+oolc_1_outer_rotor_need_two:
+  file_location: scad_output\oobb_outer_rotor_main_12_12_03\laser_flat.svg  
+oolc_2_bearing_plate_need_two:
+  file_location: oomlout_oobb_version_4\things\oobb_bearing_plate_05_05_12_6810_ex_three_quarter\laser_flat.svg
+oolc_3_inner_rotor:
+  file_location: scad_output\oobb_inner_rotor_main_12_12_03\laser_flat.svg
+
